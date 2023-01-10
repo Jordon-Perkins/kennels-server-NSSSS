@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_animals
+from views import get_all_animals, get_single_animal, get_all_customers, get_single_customer, get_all_employees, get_all_locations, get_single_employee, get_single_location, create_animal, create_customer, create_employee, create_location
 
 # where is BaseHTTPRequestHandler, HTTPServer json coming from in lines 1 & 2
 
@@ -15,6 +15,27 @@ class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
 
+    def parse_url(self, path):
+        # Just like splitting a string in JavaScript. If the
+        # path is "/animals/1", the resulting list will
+        # have "" at index 0, "animals" at index 1, and "1"
+        # at index 2.
+        path_params = path.split("/")
+        resource = path_params[1]
+        id = None
+
+        # Try to get the item at index 2
+        try:
+            # Convert the string "1" to the integer 1
+            # This is the new parseInt()
+            id = int(path_params[2])
+        except IndexError:
+            pass  # No route parameter exists: /animals
+        except ValueError:
+            pass  # Request had trailing slash: /animals/
+
+        return (resource, id)  # This is a tuple
+
     # what specifically is a DocString in this code? line 13
 
     # Here's a class function
@@ -22,29 +43,41 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Here's a method on the class that overrides the parent's method.
     # It handles any GET request.
     def do_GET(self):
-        """Handles GET requests to the server
-        """
-
-        # where does the self parameter come from? How do I know I have it to use? line 22
-        # if it is setting the response then why isn't it _set_response()? line 33
-        # what does the headers have to do with this? line 33
-
-        # Set the response code to 'Ok'
+        """Handles GET requests to the server"""
         self._set_headers(200)
+        response = {}  # Default response
 
-        # Your new console.log() that outputs to the terminal
-        print(self.path)
+        # Parse the URL and capture the tuple that is returned
+        (resource, id) = self.parse_url(self.path)
 
-        # It's an if..else statement
-        if self.path == "/animals":
-            response = get_all_animals()
+        if resource == "animals":
+            if id is not None:
+                response = get_single_animal(id)
 
-        else:
-            response = []
+            else:
+                response = get_all_animals()
 
-            # what is wfile.write and dumps line 55
+        if resource == "customers":
+            if id is not None:
+                response = get_single_customer(id)
 
-        # Send a JSON formatted string as a response
+            else:
+                response = get_all_customers()
+
+        if resource == "employees":
+            if id is not None:
+                response = get_single_employee(id)
+
+            else:
+                response = get_all_employees()
+
+        if resource == "locations":
+            if id is not None:
+                response = get_single_location(id)
+
+            else:
+                response = get_all_locations()
+
         self.wfile.write(json.dumps(response).encode())
 
         # what method? line 60
@@ -53,19 +86,39 @@ class HandleRequests(BaseHTTPRequestHandler):
     # It handles any POST request.
 
     def do_POST(self):
-        """Handles POST requests to the server"""
-
-        # where and what is created? and how do I know that i am creating something? line 68
-
-        # Set response code to 'Created'
         self._set_headers(201)
-
-        # absolute confusion lines 75-78
-
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
-        response = {"payload": post_body}
-        self.wfile.write(json.dumps(response).encode())
+
+        # Convert JSON string to a Python dictionary
+        post_body = json.loads(post_body)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Add a new animal to the list. Don't worry about
+        # the orange squiggle, you'll define the create_animal
+        # function next.
+        if resource == "animals":
+            new_animal = None
+            new_animal = create_animal(post_body)
+            self.wfile.write(json.dumps(new_animal).encode())
+
+        if resource == "customers":
+            new_customer= None
+            new_customer = create_customer(post_body)
+            self.wfile.write(json.dumps(new_customer).encode())
+
+        if resource == "employees":
+            new_employee= None
+            new_employee = create_employee(post_body)
+            self.wfile.write(json.dumps(new_employee).encode())
+
+        if resource == "locations":
+            new_location= None
+            new_location = create_location(post_body)
+            self.wfile.write(json.dumps(new_location).encode())
+            
 
     # A method that handles any PUT request.
     def do_PUT(self):
