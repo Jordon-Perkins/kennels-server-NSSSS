@@ -109,7 +109,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write("".encode())
 
     def do_POST(self):
-        self._set_headers(201)
+        status_code = 201
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -125,23 +125,36 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "animals":
             new_animal = None
             new_animal = create_animal(post_body)
+            self._set_headers(status_code)
             self.wfile.write(json.dumps(new_animal).encode())
 
         elif resource == "customers":
-            new_customer= None
+            new_customer = None
             new_customer = create_customer(post_body)
+            self._set_headers(status_code)
             self.wfile.write(json.dumps(new_customer).encode())
 
         elif resource == "employees":
-            new_employee= None
+            new_employee = None
             new_employee = create_employee(post_body)
+            self._set_headers(status_code)
             self.wfile.write(json.dumps(new_employee).encode())
 
         elif resource == "locations":
-            new_location= None
-            new_location = create_location(post_body)
-            self.wfile.write(json.dumps(new_location).encode())
-    
+            address_does_exist = "address" in post_body.keys()
+            name_does_exist = "name" in post_body.keys()
+            if not name_does_exist:
+                response = {"message": "name is required"}
+                status_code = 400
+            elif not address_does_exist:
+                response = {"message": "address is required"}
+                status_code = 400
+            else:
+                response = create_location(post_body)
+
+            self._set_headers(status_code)
+            self.wfile.write(json.dumps(response).encode())
+
 
 
     def _set_headers(self, status):
