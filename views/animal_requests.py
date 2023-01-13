@@ -1,3 +1,9 @@
+from copy import deepcopy
+
+from .location_requests import get_single_location
+from .customer_requests import get_single_customer
+
+
 ANIMALS = [
     {
         "id": 1,
@@ -24,12 +30,12 @@ ANIMALS = [
         "status": "Admitted"
     },
     {
-    "id": 3,
-    "name": "Eleanor",
-    "species": "Dog",
-    "location": 1,
-    "customerId": 2,
-    "status": "Admitted"
+        "id": 4,
+        "name": "Eleanor",
+        "species": "Dog",
+        "locationId": 1,
+        "customerId": 2,
+        "status": "Admitted"
 }
 ]
 
@@ -48,7 +54,19 @@ def get_single_animal(id):
         # Dictionaries in Python use [] notation to find a key
         # instead of the dot notation that JavaScript used.
         if animal["id"] == id:
-            requested_animal = animal
+            #deepcopy makes a copy so that request_animals can change with the new data added
+            requested_animal = deepcopy(animal)
+
+            locationId = requested_animal["locationId"]
+            location = get_single_location(locationId)
+            requested_animal["location"] = location
+
+            customerId = requested_animal["customerId"]
+            customer = get_single_customer(customerId)
+            requested_animal["customer"] = customer
+
+            del requested_animal["locationId"]
+            del requested_animal["customerId"]
 
     return requested_animal
 

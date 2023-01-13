@@ -1,9 +1,13 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_animals, get_single_animal, get_all_customers, get_single_customer, get_all_employees, get_all_locations, get_single_employee, get_single_location, create_animal, create_customer, create_employee, create_location, delete_animal, delete_customer, delete_employee, delete_location, update_animal, update_location, update_customer, update_employee
-from models import Animal
+from views import (get_all_animals, get_single_animal, get_all_customers, 
+get_single_customer, get_all_employees, get_all_locations, get_single_employee, 
+get_single_location, create_animal, create_customer, create_employee, create_location, 
+delete_animal, delete_customer, delete_employee, delete_location, update_animal, 
+update_location, update_customer, update_employee)
 
-# where is BaseHTTPRequestHandler, HTTPServer json coming from in lines 1 & 2
+
+
 
 
 # Here's a class. It inherits from another class.
@@ -37,12 +41,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         return (resource, id)  # This is a tuple
 
-    # what specifically is a DocString in this code? line 13
-
-    # Here's a class function
-
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any GET request.
     def do_GET(self):
         """Handles GET requests to the server"""
         self._set_headers(200)
