@@ -43,16 +43,20 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests to the server"""
-        self._set_headers(200)
+        
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
         (resource, id) = self.parse_url(self.path)
 
         if resource == "animals":
-            if id is not None:
+            if id is None:
+                self._set_headers(404)
+                response = { "message": f"Animal {id} has already gone home" }
+            elif id is not None:
+                self._set_headers(200)
                 response = get_single_animal(id)
-
+                    
             else:
                 response = get_all_animals()
 
