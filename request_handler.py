@@ -43,7 +43,8 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests to the server"""
-        self._set_headers(200)
+        
+        status_code = 200
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
@@ -52,10 +53,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "animals":
             if id is not None:
                 response = get_single_animal(id)
-
+                if response is None:
+                    status_code = 404
+                    response = { "message": f"Animal {id} has already gone home" }
             else:
                 response = get_all_animals()
-
+            
         elif resource == "customers":
             if id is not None:
                 response = get_single_customer(id)
@@ -77,6 +80,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             else:
                 response = get_all_locations()
 
+        self._set_headers(status_code)
         self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
