@@ -184,7 +184,8 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
     # Set a 204 response code
-        self._set_headers(204)
+        status_code = 204
+        response = {}
 
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
@@ -194,7 +195,10 @@ class HandleRequests(BaseHTTPRequestHandler):
             delete_animal(id)
 
         elif resource == "customers":
-            delete_customer(id)
+            if id is not None:
+                status_code = 405
+                response = { "message": "Please contact the company directly to authorize the deletion of a customer" }
+            #delete_customer(id)
 
         elif resource == "employees":
             delete_employee(id)
@@ -202,8 +206,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         elif resource == "locations":
             delete_location(id)
 
-    # Encode the new animal and send in response
-        self.wfile.write("".encode())
+        self._set_headers(status_code)
+        self.wfile.write(json.dumps(response).encode())
 
 
 # This function is not inside the class. It is the starting
