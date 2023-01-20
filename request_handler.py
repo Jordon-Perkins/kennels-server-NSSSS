@@ -62,6 +62,11 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_single_customer(id)
                 else:
                     response = get_all_customers()
+            elif resource == "employees":
+                if id is not None:
+                    response = get_single_employee(id)
+                else:
+                    response = get_all_employees()
 
         else: # There is a ? in the path, run the query param functions
             (resource, query) = parsed
