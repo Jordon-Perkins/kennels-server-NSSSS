@@ -122,21 +122,30 @@ def get_employees_by_location_id(location_id):
 
 #     return requested_employee
 
-def create_employee(employee):
-    # Get the id value of the last animal in the list
-    max_id = EMPLOYEES[-1]["id"]
+def create_employee(new_employee):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+        db_cursor.execute("""
+        INSERT INTO employee
+            ( name, address, location_id )
+        VALUES
+            ( ?, ?, ?);
+        """, (new_employee['name'], new_employee['address'],
+              new_employee['locationId']))
 
-    # Add an `id` property to the animal dictionary
-    employee["id"] = new_id
+        # The `lastrowid` property on the cursor will return
+        # the primary key of the last thing that got added to
+        # the database.
+        id = db_cursor.lastrowid
 
-    # Add the animal dictionary to the list
-    EMPLOYEES.append(employee)
+        # Add the `id` property to the animal dictionary that
+        # was sent by the client so that the client sees the
+        # primary key in the response.
+        new_employee['id'] = id
 
-    # Return the dictionary with `id` property added
-    return employee
+
+    return new_employee
 
 
 def delete_employee(id):
