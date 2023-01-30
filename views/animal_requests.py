@@ -86,7 +86,7 @@ def get_all_animals(query_params):
         {sort_by}
         """
 
-        print(sql_to_execute)
+        # print(sql_to_execute)
         db_cursor.execute(sql_to_execute)
         dataset = db_cursor.fetchall()
 
