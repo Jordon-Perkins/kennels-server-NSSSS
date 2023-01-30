@@ -53,15 +53,19 @@ def get_all_animals(query_params):
         db_cursor = conn.cursor()
 
         sort_by = ""
+        where_clause = ""
         if len(query_params) != 0:
-            param = query_params[0]
-            [qs_key, qs_value] = param.split("=")
+            first_param = query_params[0]
+            [query_string_key, query_string_value] = first_param.split("=")
 
-            if qs_key == "_sortBy":
-                if qs_value == 'location':
+            if query_string_key == "_sortBy":
+                if query_string_value == 'location':
                     sort_by = " ORDER BY location_id"
-                elif qs_value == 'customer':
+                elif query_string_value == 'customer':
                     sort_by = " ORDER BY customer_id"
+
+            elif query_string_key == "locationId":
+                where_clause = f" WHERE a.location_id = {query_string_value}"
 
         # Write the SQL query to get the information you want
         sql_to_execute = f"""
@@ -83,10 +87,11 @@ def get_all_animals(query_params):
             ON l.id = a.location_id
 		JOIN `Customer` c
 			ON c.id = a.customer_id
+        {where_clause}
         {sort_by}
         """
 
-        # print(sql_to_execute)
+        print(sql_to_execute)
         db_cursor.execute(sql_to_execute)
         dataset = db_cursor.fetchall()
 
