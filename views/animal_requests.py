@@ -57,9 +57,11 @@ def get_all_animals(query_params):
             param = query_params[0]
             [qs_key, qs_value] = param.split("=")
 
-        if qs_key == "_sortBy":
-            if qs_value == 'location':
-                sort_by = " ORDER BY location_id"
+            if qs_key == "_sortBy":
+                if qs_value == 'location':
+                    sort_by = " ORDER BY location_id"
+                elif qs_value == 'customer':
+                    sort_by = " ORDER BY customer_id"
 
         # Write the SQL query to get the information you want
         sql_to_execute = f"""
@@ -71,10 +73,16 @@ def get_all_animals(query_params):
             a.location_id,
             a.customer_id,
             l.name location_name,
-            l.address location_address
+            l.address location_address,
+			c. name customer_name,
+			c. address customer_address,
+			c. email customer_email,
+			c. password customer_password
         FROM Animal a
         JOIN `Location` l
             ON l.id = a.location_id
+		JOIN `Customer` c
+			ON c.id = a.customer_id
         {sort_by}
         """
 
@@ -95,12 +103,12 @@ def get_all_animals(query_params):
                 # Create a Location instance from the current row
             location = Location(row['id'], row['location_name'], 
                         row['location_address'])
-            # customer = Customer(row['id'], row['customer_name'], 
-            #             row['customer_address'], row['customer_email'], 
-            #             row['customer_password'])
+            customer = Customer(row['id'], row['customer_name'], 
+                        row['customer_address'], row['customer_email'], 
+                        row['customer_password'])
                 # Add the dictionary representation of the location to the animal
             animal.location = location.__dict__
-            # animal.customer = customer.__dict__
+            animal.customer = customer.__dict__
 
                 # Add the dictionary representation of the animal to the list
             animals.append(animal.__dict__)
