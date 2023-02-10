@@ -63,6 +63,8 @@ def get_all_animals(query_params):
                     sort_by = " ORDER BY location_id"
                 elif query_string_value == 'customer':
                     sort_by = " ORDER BY customer_id"
+                elif query_string_value == 'animal':
+                    sort_by = " ORDER BY status"
 
             elif query_string_key == "locationId":
                 where_clause = f" WHERE a.location_id = {query_string_value}"
